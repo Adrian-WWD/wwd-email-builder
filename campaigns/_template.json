@@ -1,0 +1,24 @@
+{
+  "name": "Candidate Name",
+  "audience": "friend",
+  "mergeTag": "{{FirstName or '%FALLBACK%'}}",
+  "askMerge": "{{if HighestPreviousContributionAmount and greater_than_or_equal_to(HighestPreviousContributionAmount,250)}}250{{elseif HighestPreviousContributionAmount and less_than_or_equal_to(HighestPreviousContributionAmount,10)}}10{{else}}{{HighestPreviousContributionAmount or '3'}}{{end}}",
+  "pages": [
+    { "name": "Main", "url": "https://secure.actblue.com/donate/your-form" }
+  ],
+  "defaultPage": 0,
+  "refPattern": "em-%DATE%-all-%V%",
+  "abx": {
+    "amounts": [10, 35, 50, 100, 250],
+    "label": "Chip in $%AMT% Now",
+    "otherLabel": "Another amount",
+    "color": "#21195a",
+    "otherColor": "#9accf0",
+    "intro": "If you've saved your payment information with ActBlue Express, your donation will go through immediately:"
+  },
+  "donateLabel": "Donate",
+  "image": { "maxWidth": 360, "border": "2pt solid #21195a" },
+  "placeholders": [
+    { "token": "[[ SIG ]]", "html": "<p>With you,</p>\n<p>Candidate Name</p>" }
+  ]
+}

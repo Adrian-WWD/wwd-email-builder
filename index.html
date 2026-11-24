@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WWD Email Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="wm">WestWest <b>Digital</b></span><h1>Email Builder</h1></div>
+  <div class="source-note" id="sourceNote">Loading campaigns…</div>
+</header>
+
+<div class="app">
+  <section class="panel" aria-label="Email input">
+    <div class="card">
+      <h2>Draft</h2>
+      <label class="f" id="docRow">Google Doc link
+        <span class="inline">
+          <input class="grow" type="url" id="docUrl" placeholder="https://docs.google.com/document/d/…">
+          <button class="btn btn-2" id="loadDoc">Load draft</button>
+        </span>
+      </label>
+      <div class="subtle"><span id="orWord">Or </span><label class="linkbtn">import a .docx or .pdf<input type="file" id="file" accept=".docx,.pdf" hidden></label>, or paste the whole doc into Email copy below.</div>
+    </div>
+
+    <div class="inline">
+      <label class="f grow">Campaign <select id="guideSel"></select></label>
+      <button class="btn" id="editGuide">Settings</button>
+      <button class="btn" id="newGuide">New</button>
+    </div>
+
+    <div class="card">
+      <h2>Draft details</h2>
+      <label class="f">Description <input type="text" id="mDesc"></label>
+      <div class="row2">
+        <label class="f">Sender <input type="text" id="mSender"></label>
+        <label class="f">Date <input type="text" id="mDate" placeholder="11.19.26"></label>
+      </div>
+      <label class="f">Subject lines <span class="hint">One per line. Each gets its own A/B version.</span>
+        <textarea class="plain" id="mSubjects" rows="3"></textarea>
+      </label>
+      <label class="f">Preview text <span class="hint">Optional</span><input type="text" id="mPreview"></label>
+      <div class="row2">
+        <label class="f">Ask <span class="hint">Blank = HPC ask</span><input type="text" id="mAsk" inputmode="decimal" placeholder="HPC ask"></label>
+        <label class="f">Segments <input type="text" id="mSegments"></label>
+      </div>
+      <label class="f">Raising into <select id="pageSel"></select></label>
+      <label class="f" id="customUrlWrap" hidden>Page URL <input type="url" id="customUrl" placeholder="https://secure.actblue.com/donate/…"></label>
+      <label class="f">Refcode <span class="hint">%V% becomes a, b, c… per subject line</span><input type="text" id="refcode"></label>
+      <p class="extra" id="mExtra" hidden></p>
+    </div>
+
+    <div class="card" id="imgs" hidden>
+      <h2>Images</h2>
+      <div id="imgSlots"></div>
+    </div>
+
+    <div class="card">
+      <h2>Custom placeholders</h2>
+      <p class="lede">Tokens like <code>[[ SIG ]]</code>. Alone on a line they’re swapped as a block; inside a sentence, inline. Changes here last for this session; use Campaign → Settings → Copy JSON to make them permanent.</p>
+      <div class="rows" id="phRows"></div>
+      <div><button class="btn" id="addPh">Add placeholder</button></div>
+    </div>
+
+    <div class="source-head">
+      <h2>Email copy</h2>
+      <button class="linkbtn" id="clearSrc">Clear all</button>
+    </div>
+    <div id="source" contenteditable="true" spellcheck="true" aria-label="Email copy"
+      data-placeholder="Load a draft above, drop a .docx or .pdf here, or paste the whole Google Doc.
+
+Everything above “BEGIN EMAIL DRAFT” fills the details; everything below becomes the email."></div>
+
+    <details class="legend">
+      <summary>Placeholder guide</summary>
+      <table id="legendTable"></table>
+    </details>
+  </section>
+
+  <section class="out" aria-label="Output">
+    <div class="out-bar">
+      <div class="tabs" role="group" aria-label="View">
+        <button id="tabPreview" aria-pressed="true">Preview</button>
+        <button id="tabCode" aria-pressed="false">HTML</button>
+      </div>
+      <div class="tabs" role="group" aria-label="Subject line version" id="abTabs" hidden></div>
+      <div class="tabs" role="group" aria-label="Segment version" id="segTabs" hidden></div>
+      <div class="tabs" role="group" aria-label="Preview width" id="widthTabs">
+        <button id="wDesk" aria-pressed="true">Desktop</button>
+        <button id="wMob" aria-pressed="false">Mobile</button>
+      </div>
+      <span class="spacer"></span>
+      <button class="btn btn-3" id="dl">Download</button>
+      <button class="btn btn-1" id="copy">Copy HTML</button>
+    </div>
+    <div class="verinfo" id="verinfo"></div>
+    <div class="checks" id="checks"></div>
+    <div class="stage" id="stage"><div class="frame" id="frame"><iframe id="preview" title="Email preview" sandbox="allow-same-origin"></iframe></div></div>
+    <div class="codewrap" id="codewrap"><textarea id="code" readonly spellcheck="false" aria-label="Email HTML"></textarea></div>
+  </section>
+</div>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <div class="dlg">
+    <div class="dlg-head"><h2 id="dlgTitle">Campaign settings</h2><button class="btn" id="dlgClose">Close</button></div>
+    <div class="dlg-body">
+      <p class="dlg-note" id="dlgNote"></p>
+      <fieldset>
+        <legend>Voice</legend>
+        <label class="f">Campaign name <span class="hint">Matched against the draft’s title</span><input type="text" data-k="name"></label>
+        <div class="row2">
+          <label class="f">Audience word <span class="hint">NAME fallback, capitalized at sentence start</span><input type="text" data-k="audience"></label>
+          <label class="f">Name merge tag <span class="hint">%FALLBACK% = audience word</span><input type="text" data-k="mergeTag"></label>
+        </div>
+        <label class="f">Ask merge <span class="hint">What $ASK becomes when the draft doesn’t state an amount</span><textarea rows="4" data-k="askMerge"></textarea></label>
+      </fieldset>
+      <fieldset>
+        <legend>Donation pages</legend>
+        <p class="extra">The selected page is the default.</p>
+        <div class="rows" id="pageRows"></div>
+        <div><button class="btn" id="addPage">Add page</button></div>
+        <label class="f">Refcode pattern <span class="hint">%DATE% = MM.DD.YY · %V% = a, b, c</span><input type="text" data-k="refPattern"></label>
+      </fieldset>
+      <fieldset>
+        <legend>ActBlue Express buttons</legend>
+        <label class="f">Amounts <span class="hint">Two per row; “Another amount” fills the last slot</span><input type="text" data-k="abx.amounts"></label>
+        <div class="row2">
+          <label class="f">Button text <span class="hint">%AMT% = amount</span><input type="text" data-k="abx.label"></label>
+          <label class="f">Other amount text <input type="text" data-k="abx.otherLabel"></label>
+        </div>
+        <div class="colors">
+          <label class="color"><input type="color" data-k="abx.color"><span>Amount buttons<small data-v="abx.color"></small></span></label>
+          <label class="color"><input type="color" data-k="abx.otherColor"><span>Another amount<small data-v="abx.otherColor"></small></span></label>
+        </div>
+        <label class="f">Intro line <span class="hint">Blank for none</span><input type="text" data-k="abx.intro"></label>
+        <label class="f">[[ DONATE ]] button text <input type="text" data-k="donateLabel"></label>
+      </fieldset>
+      <fieldset>
+        <legend>Images</legend>
+        <div class="row2">
+          <label class="f">Max width (px) <input type="number" min="100" max="800" data-k="image.maxWidth"></label>
+          <label class="f">Border <input type="text" data-k="image.border"></label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn" id="copyJson">Copy JSON</button>
+      <button class="btn" id="dlJson">Download JSON</button>
+      <span class="spacer"></span>
+      <button class="btn btn-1" id="applyGuide">Use for this session</button>
+    </div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="src/core.js"></script>
+<script src="src/parse-doc.js"></script>
+<script src="src/render.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>
