@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WWD Campaign Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+<header>
+  <div class="brand"><span class="wm">WestWest <b>Digital</b></span><h1>Campaign Editor</h1></div>
+  <div class="source-note" id="sourceNote">Loading…</div>
+  <a class="hdr-link" href="index.html">Email builder</a>
+</header>
+
+<div class="app">
+  <section class="panel" aria-label="Campaign settings">
+    <div class="card">
+      <h2>Start from</h2>
+      <div class="inline">
+        <label class="f grow">Campaign <select id="startSel"></select></label>
+        <label class="btn" style="cursor:pointer">Open .json<input type="file" id="openFile" accept=".json,application/json" hidden></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Basics</h2>
+      <label class="f">Campaign name <span class="hint">Shown in the builder, and matched against the draft’s title</span><input type="text" data-k="name" placeholder="Jake Johnson"></label>
+      <label class="f">File name <span class="hint">campaigns/<span id="fileShow">…</span></span><input type="text" id="fileName" placeholder="jake-johnson"></label>
+    </div>
+
+    <div class="card">
+      <h2>Voice</h2>
+      <div class="row2">
+        <label class="f">Audience word <span class="hint">Used when there’s no first name</span><input type="text" data-k="audience" placeholder="friend"></label>
+        <label class="f">Name merge tag <span class="hint">%FALLBACK% = audience word</span><input type="text" data-k="mergeTag"></label>
+      </div>
+      <label class="f">Ask merge <span class="hint">What $ASK becomes when the draft doesn’t give an amount</span><textarea rows="4" data-k="askMerge"></textarea></label>
+      <div><button class="linkbtn" id="resetAsk">Reset to the standard HPC ask</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Donation pages</h2>
+      <p class="lede">Pick the one most emails raise into as the default.</p>
+      <div class="rows" id="pageRows"></div>
+      <div><button class="btn" id="addPage">Add page</button></div>
+      <label class="f">Refcode pattern <span class="hint">%DATE% = MM.DD.YY · %V% = a, b, c per subject line</span><input type="text" data-k="refPattern"></label>
+    </div>
+
+    <div class="card">
+      <h2>ActBlue Express buttons</h2>
+      <label class="f">Amounts <span class="hint">Two per row; “Another amount” fills the last slot</span><input type="text" data-k="abx.amounts" placeholder="10, 35, 50, 100, 250"></label>
+      <div class="row2">
+        <label class="f">Button text <span class="hint">%AMT% = amount</span><input type="text" data-k="abx.label"></label>
+        <label class="f">Other amount text <input type="text" data-k="abx.otherLabel"></label>
+      </div>
+      <div class="row2">
+        <label class="f">Amount button color <span class="colorpair"><input type="color" data-c="abx.color" aria-label="Amount button color picker"><input type="text" data-k="abx.color" placeholder="#21195a"></span></label>
+        <label class="f">“Another amount” color <span class="colorpair"><input type="color" data-c="abx.otherColor" aria-label="Another amount color picker"><input type="text" data-k="abx.otherColor" placeholder="#9accf0"></span></label>
+      </div>
+      <label class="f">Intro line <span class="hint">Small italic line above the grid; blank for none</span><input type="text" data-k="abx.intro"></label>
+      <label class="f">[[ DONATE ]] button text <input type="text" data-k="donateLabel"></label>
+    </div>
+
+    <div class="card">
+      <h2>Images</h2>
+      <div class="row2">
+        <label class="f">Default max width (px) <span class="hint">Each email can override it</span><input type="number" min="50" max="800" step="10" data-k="image.maxWidth"></label>
+        <label class="f">Border <span class="hint">Blank for none</span><input type="text" data-k="image.border" placeholder="2pt solid #21195a"></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Custom placeholders</h2>
+      <p class="lede">Tokens writers can use in drafts, like <code>[[ SIG ]]</code>, and the HTML they turn into.</p>
+      <div class="rows" id="phRows"></div>
+      <div><button class="btn" id="addPh">Add placeholder</button></div>
+    </div>
+  </section>
+
+  <section class="out" aria-label="Preview and output">
+    <div class="out-bar">
+      <span class="tablabel" id="modeLabel">New campaign</span>
+      <span class="spacer"></span>
+      <button class="btn" id="dlJson">Download</button>
+      <button class="btn btn-3" id="copyJson">Copy JSON</button>
+      <button class="btn btn-1" id="toGithub">Add to GitHub</button>
+    </div>
+    <div class="checks" id="checks"></div>
+    <div class="steps" id="steps"></div>
+    <div class="stage"><div class="frame"><iframe id="preview" title="Sample email with these settings" sandbox="allow-same-origin"></iframe></div></div>
+    <div class="codewrap on" style="padding-top:0">
+      <label class="f">campaigns/<span id="fileShow2">…</span>
+        <textarea id="json" readonly spellcheck="false" rows="18" aria-label="Campaign JSON"></textarea>
+      </label>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="src/core.js"></script>
+<script src="src/editor.js"></script>
+</body>
+</html>

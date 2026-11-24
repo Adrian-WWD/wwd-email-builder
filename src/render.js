@@ -133,7 +133,9 @@
     if (!d.url) V.st.imgMissing.push(key);
     let link = (d.link || '').trim() || V.page;
     if (link && isActBlue(link)) link = setParams(link, [['refcode', V.ref]]);
-    return fill(V.T.image, { HREF: esc(link), SRC: `%%IMG_${key}%%`, ALT: esc(d.alt || ''), MAXWIDTH: +V.g.image.maxWidth || 360, BORDER: esc(V.g.image.border || 'none') });
+    const width = Math.round(+d.width) || +V.g.image.maxWidth || 360;
+    const border = (V.g.image.border || '').trim();
+    return fill(V.T.image, { HREF: esc(link), SRC: `%%IMG_${key}%%`, ALT: esc(d.alt || ''), MAXWIDTH: width, BORDER: border ? ' border: ' + esc(border) + ';' : '' });
   }
 
   /* ---------- body ---------- */

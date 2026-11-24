@@ -17,7 +17,7 @@
     "intro": "If you've saved your payment information with ActBlue Express, your donation will go through immediately:"
   },
   "donateLabel": "Donate",
-  "image": { "maxWidth": 360, "border": "2pt solid #21195a" },
+  "image": { "maxWidth": 360, "border": "" },
   "placeholders": [
     { "token": "[[ SIG ]]", "html": "<p>With you,</p>\n<p>Candidate Name</p>" }
   ]

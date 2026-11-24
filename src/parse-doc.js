@@ -54,7 +54,9 @@
     let i = 0; const images = {};
     bodyDiv.querySelectorAll('img').forEach(img => {
       const k = String(++i); const src = img.getAttribute('src') || '';
-      if (/^data:image\//.test(src)) images[k] = src;
+      const wm = /(?:^|;)\s*width\s*:\s*([\d.]+)px/i.exec(img.getAttribute('style') || '');
+      const width = Math.round(wm ? +wm[1] : +(img.getAttribute('width') || 0)) || 0;
+      images[k] = { src: /^data:image\//.test(src) ? src : '', width };
       const p = doc.createElement('p'); p.textContent = `[[ IMG ${k} ]]`; img.replaceWith(p);
     });
     return { title, rows, bodyHTML: bodyDiv.innerHTML, images };

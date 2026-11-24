@@ -49,6 +49,10 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:#0c
 header h1{font-size:22px;margin:0;line-height:1.1;color:#fbf4ea}
 .source-note{margin-left:auto;font-size:13px;color:#c9d6e8}
 .source-note b{color:#fbf4ea;font-weight:600}
+.hdr-link{color:#fbf4ea;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(251,244,234,.45);border-radius:5px;padding:7px 11px}
+.hdr-link:hover{border-color:#fbf4ea}
+.wrow{grid-column:2;display:flex;align-items:center;gap:8px;font-weight:400;color:var(--ink-soft)}
+.wrow input{width:96px;flex:none}
 
 .app{display:grid;grid-template-columns:minmax(330px,470px) 1fr;min-height:calc(100vh - 60px)}
 @media (max-width:940px){.app{grid-template-columns:1fr}}
@@ -155,3 +159,13 @@ legend{font-size:18px;margin-bottom:10px;padding:0;color:var(--ink)}
 .toast.on{opacity:1}
 .loading{padding:40px 22px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.frame,.toast{transition:none}}
+
+/* campaign editor */
+.colorpair{display:flex;gap:8px;align-items:center}
+.colorpair input[type=color]{width:42px;height:36px;border:1px solid var(--line-strong);border-radius:5px;padding:2px;background:var(--field);flex:none}
+.steps{padding:10px 22px 0;display:flex;flex-direction:column;gap:8px}
+.steps[hidden]{display:none}
+.step{font-size:13.5px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.step .num{font-family:"DM Serif Display",Georgia,serif;font-size:20px;color:var(--red);line-height:1}
+.step .grow{flex:1;min-width:200px}
+#json{min-height:0}

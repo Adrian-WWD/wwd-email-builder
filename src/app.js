@@ -33,7 +33,7 @@
     else sel.value = g.pages.length ? String(Math.min(g.defaultPage || 0, g.pages.length - 1)) : 'custom';
     $('#customUrlWrap').hidden = sel.value !== 'custom';
     if (!refTouched) $('#refcode').value = refBase(g);
-    renderPhRows(); renderLegend();
+    renderPhRows(); renderLegend(); slotKey = null;
   }
   const refBase = g => g.refPattern.replace(/%DATE%/g, fmtDate($('#mDate').value) || 'MM.DD.YY');
   const pageUrl = () => { const v = $('#pageSel').value; return v === 'custom' ? $('#customUrl').value.trim() : ((G().pages[+v] || {}).url || ''); };
@@ -102,7 +102,7 @@
   function clearMeta() { ['#mDesc', '#mSender', '#mSubjects', '#mPreview', '#mAsk', '#mSegments', '#mDate'].forEach(s => $(s).value = ''); $('#mExtra').hidden = true; draftTitle = ''; imgData = {}; refTouched = false; $('#refcode').value = refBase(G()); }
   function loadParsed(res, note) {
     clearMeta(); applyMeta(res);
-    imgData = {}; for (const [k, src] of Object.entries(res.images || {})) imgData[k] = { preview: src };
+    imgData = {}; for (const [k, im] of Object.entries(res.images || {})) imgData[k] = typeof im === 'string' ? { preview: im } : { preview: im.src || '', docWidth: im.width || 0 };
     slotKey = null; $('#source').innerHTML = res.bodyHTML;
     build();
     toast(res.noMarker ? 'Loaded, but there’s no “BEGIN EMAIL DRAFT” line, so the whole doc is in the copy.' : note);
@@ -159,9 +159,20 @@
     $('#imgSlots').innerHTML = keys.map(k => `<div class="slot"><span>Image ${esc(k)}</span>
       ${imgData[k]?.preview ? `<img class="thumb" src="${imgData[k].preview}" alt="Image ${esc(k)} from the draft">` : '<span></span>'}
       <input type="url" data-img="${esc(k)}" data-f="url" placeholder="Hosted image URL" value="${esc(imgData[k]?.url || '')}">
-      <input type="url" data-img="${esc(k)}" data-f="link" placeholder="Link (default: page you’re raising into)" value="${esc(imgData[k]?.link || '')}"></div>`).join('');
+      <input type="url" data-img="${esc(k)}" data-f="link" placeholder="Link (default: page you’re raising into)" value="${esc(imgData[k]?.link || '')}">
+      <span class="wrow"><input type="number" min="50" max="800" step="10" data-img="${esc(k)}" data-f="width" placeholder="${esc(G().image.maxWidth)}" value="${esc(imgData[k]?.width || '')}" aria-label="Max width for image ${esc(k)} in pixels"><span>px max width${imgData[k]?.width ? '' : ' (campaign default)'}</span>${imgData[k]?.docWidth && +imgData[k].docWidth !== +(imgData[k].width || G().image.maxWidth) ? ` <button class="linkbtn" data-usew="${esc(k)}">Use doc size (${imgData[k].docWidth}px)</button>` : ''}</span></div>`).join('');
   }
-  $('#imgSlots').addEventListener('input', e => { const el = e.target; if (!el.dataset.img) return; (imgData[el.dataset.img] ||= {})[el.dataset.f] = el.value.trim(); rebuild(); });
+  $('#imgSlots').addEventListener('input', e => {
+    const el = e.target; if (!el.dataset.img) return;
+    (imgData[el.dataset.img] ||= {})[el.dataset.f] = el.value.trim();
+    if (el.dataset.f === 'width') { const lab = el.nextElementSibling; if (lab) lab.textContent = 'px max width' + (el.value.trim() ? '' : ' (campaign default)'); }
+    rebuild();
+  });
+  $('#imgSlots').addEventListener('click', e => {
+    const b = e.target.closest('[data-usew]'); if (!b) return;
+    const k = b.dataset.usew; imgData[k].width = String(imgData[k].docWidth);
+    slotKey = null; build();
+  });
 
   /* ---------- build ---------- */
   function build() {

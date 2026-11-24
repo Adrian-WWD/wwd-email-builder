@@ -5,12 +5,14 @@ Turns a campaign email draft (Google Doc template) into EveryAction-ready HTML: 
 ## What lives where
 
 ```
-index.html            page shell
+index.html            the email builder
+campaign-editor.html  form for making and editing campaign files
 src/
   core.js             helpers, campaign defaults, loads campaigns + templates
   parse-doc.js        Google Doc / .docx / .pdf → draft details + email copy
   render.js           email copy → EveryAction HTML
-  app.js              the interface
+  app.js              the builder interface
+  editor.js           the campaign editor
   styles.css          WWD look
 templates/            HTML snippets for buttons, grids and images (see templates/README.md)
 campaigns/
@@ -21,6 +23,10 @@ scripts/build.mjs     bundles everything into dist/email-builder.html
 ```
 
 ## Adding or changing a campaign
+
+The easy way: open **Campaign editor** (top right of the builder, or `/campaign-editor.html`). Pick an existing campaign or start blank, fill in the form, check the sample preview, then **Add to GitHub** / **Update on GitHub**. For a new campaign it opens GitHub with the file already filled in, then walks you through adding it to `campaigns/index.json`.
+
+By hand:
 
 1. Copy `campaigns/_template.json` to `campaigns/<candidate-name>.json` and fill it in.
 2. Add the file name to `campaigns/index.json`.
@@ -40,7 +46,7 @@ You can also fill a campaign out in the app (**New** or **Settings**), then use 
 | `refPattern` | Refcode; `%DATE%` = draft date as MM.DD.YY, `%V%` = a, b, c per subject line |
 | `abx` | Express grid: `amounts`, button `label` (`%AMT%`), `otherLabel`, `color`, `otherColor`, `intro` |
 | `donateLabel` | Text for `[[ DONATE ]]` |
-| `image` | `maxWidth` and `border` for images |
+| `image` | Default `maxWidth` for images (each email can override it per image) and an optional `border` (leave `""` for none) |
 | `placeholders` | Custom tokens: `{ "token": "[[ SIG ]]", "html": "<p>…</p>" }` |
 
 ## Changing button or image markup

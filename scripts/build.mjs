@@ -24,6 +24,7 @@ html = html.replace(/<script src="(src\/[^"]+)"><\/script>/g, (m, p) => {
   first = false;
   return `${pre}<script>\n${js}</script>`;
 });
+html = html.replace('href="campaign-editor.html"', 'href="https://adrian-wwd.github.io/wwd-email-builder/campaign-editor.html"');
 mkdirSync(join(root, 'dist'), { recursive: true });
 writeFileSync(join(root, 'dist/email-builder.html'), html);
 console.log(`Built dist/email-builder.html with ${campaigns.length} campaign(s), ${TEMPLATE_NAMES.length} templates.`);

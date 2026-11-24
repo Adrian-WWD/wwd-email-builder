@@ -10,7 +10,7 @@ window.WWD = window.WWD || {};
     pages: [], defaultPage: 0, refPattern: 'em-%DATE%-all-%V%',
     abx: { amounts: [10, 35, 50, 100, 250], label: 'Chip in $%AMT% Now', otherLabel: 'Another amount', color: '#21195a', otherColor: '#9accf0',
       intro: "If you've saved your payment information with ActBlue Express, your donation will go through immediately:" },
-    donateLabel: 'Donate', image: { maxWidth: 360, border: '2pt solid #21195a' }, placeholders: []
+    donateLabel: 'Donate', image: { maxWidth: 360, border: '' }, placeholders: []
   };
 
   const TEMPLATE_NAMES = ['abx-cell', 'abx-row', 'abx-ghost-mid', 'abx-ghost-end', 'abx-row-separator', 'abx-intro', 'abx-grid', 'single-button', 'image'];
